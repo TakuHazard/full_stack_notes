@@ -2,6 +2,20 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 
+const mongoose  = require('mongoose')
+
+const url = `mongodb+srv://fullstack:${password}@cluster0-2fmje.mongodb.net/note-app?retryWrites=true&w=majority`
+mongoose.connect(url,{useNewUrlParser : true, useUnifiedTopology : true})
+
+const noteSchema = new mongoose.Schema({
+    content : String,
+    date : Date,
+    important: Boolean,
+})
+
+const Note = mongoose.model('Note', noteSchema)
+
+
 app.use(express.static('build'))
 app.use(cors())
 
