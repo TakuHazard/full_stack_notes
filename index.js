@@ -3,7 +3,12 @@ const cors = require('cors')
 const app = express()
 
 const mongoose  = require('mongoose')
+if(process.argv.length < 3){
+    console.log("enter password")
+    process.exit(1)
+}
 
+const password = process.argv[2]
 const url = `mongodb+srv://fullstack:${password}@cluster0-2fmje.mongodb.net/note-app?retryWrites=true&w=majority`
 mongoose.connect(url,{useNewUrlParser : true, useUnifiedTopology : true})
 
@@ -11,6 +16,14 @@ const noteSchema = new mongoose.Schema({
     content : String,
     date : Date,
     important: Boolean,
+})
+
+noteSchema.set('toJSON',{
+    transform : (document, returnedObject) =>{
+        returnedObject.id = returnedObject._id.toString()
+        delete returnedObject._id
+        delete returnedObject.__v
+    }
 })
 
 const Note = mongoose.model('Note', noteSchema)
@@ -46,8 +59,10 @@ app.get('/', (req,res)=>{
     res.send('<h1>Hello World !</h1>')
 })
 
-app.get('/api/notes', (req,res)=>{
-    res.json(notes)
+app.get('/api/notes', (request,response)=>{
+    Note.find({}).then(notes =>{
+        response.json(notes)
+    })
 })
 
 app.get('/api/notes/:id',(request,response) =>{
